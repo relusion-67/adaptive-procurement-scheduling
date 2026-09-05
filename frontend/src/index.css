@@ -1,111 +1,1659 @@
+/* ==========================================================================
+   Adaptive Procurement Scheduling — design tokens
+   --------------------------------------------------------------------------
+   Palette: a working procurement-field green (not the generic AI cream +
+   terracotta pairing), with a harvest-ochre accent reserved for the token/
+   ticket motif. Status colours never stand alone — every status pairing in
+   this app is also carried by an icon and a text label.
+   ========================================================================== */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  color-scheme: light;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* Surfaces & text */
+  --color-bg: #f7f8f4;
+  --color-bg-desktop: #eef1ea;
+  --color-surface: #ffffff;
+  --color-surface-tint: #f1f4ee;
+  --color-ink: #1c2b22;
+  --color-text: #45524a;
+  --color-text-soft: #6b7a70;
+  --color-border: #dde3d8;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+  /* Brand */
+  --color-primary: #2f6f4e;
+  --color-primary-dark: #234f39;
+  --color-primary-tint: #e4eee7;
+  --color-accent: #c97a2b;
+  --color-accent-tint: #f6e6d2;
+
+  /* Status */
+  --color-good: #2f6f4e;
+  --color-good-bg: #e4eee7;
+  --color-warning: #a5680f;
+  --color-warning-bg: #faf0da;
+  --color-danger: #a83e28;
+  --color-danger-bg: #fae4dd;
+  --color-neutral: #5b6b60;
+  --color-neutral-bg: #edf1ec;
+
+  /* Shape & elevation */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 2px rgba(28, 43, 34, 0.06);
+
+  --font-sans:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+/* ==========================================================================
+   Reset & base
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+  min-height: 100dvh;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+h2,
+h3 {
+  color: var(--color-ink);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
 p {
   margin: 0;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+button,
+input {
+  font-family: inherit;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+button {
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ==========================================================================
+   App shell
+   --------------------------------------------------------------------------
+   Breakpoints:
+     - default   : phone,  farmer-first, bottom nav
+     - >=640px   : tablet, same structure but with more breathing room and
+                   multi-column content grids
+     - >=1024px  : desktop, full-width application frame with a persistent
+                   sidebar (bottom nav is hidden). The sidebar is written so
+                   a future Staff/Admin workspace can be added alongside the
+                   farmer nav without restructuring this file.
+   ========================================================================== */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  width: 100%;
+  background: var(--color-surface);
+}
+
+.app-shell__body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* ---- Sidebar (desktop only) -------------------------------------------- */
+.app-shell__sidebar {
+  display: none;
+}
+
+.app-shell__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.app-shell__topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  background: var(--color-surface);
+  z-index: 5;
+}
+
+.app-shell__brand,
+.app-shell__spacer {
+  width: 40px;
+  flex-shrink: 0;
+}
+
+.app-shell__title {
+  flex: 1;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-ink);
+}
+
+.app-shell__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 16px 24px;
+}
+
+.app-shell__content-inner {
+  width: 100%;
+}
+
+/* ---- Bottom nav (mobile + tablet) --------------------------------------- */
+.app-shell__nav {
+  display: flex;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+  position: sticky;
+  bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.app-shell__nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px 12px;
+  background: none;
+  border: none;
+  color: var(--color-text-soft);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.app-shell__nav-item svg {
+  width: 22px;
+  height: 22px;
+}
+
+.app-shell__nav-item--active {
+  color: var(--color-primary);
+}
+
+/* Staff entry point is tablet-only in the bottom nav: hidden on phone
+   (below), and hidden again at >=1024px by the existing rule that hides
+   .app-shell__nav entirely once the sidebar takes over. */
+.app-shell__nav-item--staff {
+  display: none;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  padding: 8px;
+  display: inline-flex;
+  border-radius: var(--radius-sm);
+  color: var(--color-ink);
+  cursor: pointer;
+  min-width: 40px;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button:hover {
+  background: var(--color-surface-tint);
+}
+
+/* ---- Tablet: same structure, more horizontal room ---------------------- */
+@media (min-width: 640px) {
+  body {
+    background: var(--color-bg-desktop);
+  }
+
+  .app-shell__topbar {
+    padding: 16px 24px;
+  }
+
+  .app-shell__content {
+    padding: 28px 32px 32px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .app-shell__content-inner {
+    max-width: 640px;
+  }
+
+  .app-shell__nav {
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .app-shell__nav-item {
+    flex: 0 0 120px;
+  }
+
+  .app-shell__nav-item--staff {
+    display: flex;
+  }
+}
+
+/* ---- Desktop: full application layout, no phone-shaped container ------- */
+@media (min-width: 1024px) {
+  body {
+    background: var(--color-bg-desktop);
+  }
+
+  .app-shell {
+    min-height: 100dvh;
+  }
+
+  .app-shell {
+    background: var(--color-bg-desktop);
+  }
+
+  .app-shell__body {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    background: var(--color-surface);
+    border-left: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+  }
+
+  /* Sidebar replaces the bottom nav entirely on desktop. */
+  .app-shell__sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 260px;
+    flex-shrink: 0;
+    padding: 24px 16px;
+    gap: 28px;
+    border-right: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .app-shell__sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 8px;
+    font-weight: 700;
+    font-size: 1.02rem;
+    color: var(--color-ink);
+  }
+
+  .app-shell__sidebar-brand svg {
+    width: 24px;
+    height: 24px;
+    color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  .app-shell__sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .app-shell__sidebar-heading {
+    margin: 4px 8px 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+
+  .app-shell__sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: none;
+    background: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    text-align: left;
+    min-height: 44px;
+  }
+
+  .app-shell__sidebar-link svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: var(--color-text-soft);
+  }
+
+  .app-shell__sidebar-link:hover {
+    background: var(--color-surface-tint);
+  }
+
+  .app-shell__sidebar-link--active {
+    background: var(--color-primary-tint);
+    color: var(--color-primary-dark);
+  }
+
+  .app-shell__sidebar-link--active svg {
+    color: var(--color-primary-dark);
+  }
+
+  /* Reserved space for future Staff/Admin dashboards - visible so the
+     product's direction is clear, but visually muted and non-interactive
+     since the workspace doesn't exist yet. */
+  .app-shell__sidebar-future {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .app-shell__sidebar-future-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-soft);
+  }
+
+  .app-shell__sidebar-future-link svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .app-shell__sidebar-future-link span:nth-child(2) {
+    flex: 1;
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .app-shell__sidebar-future-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    background: var(--color-neutral-bg);
+    color: var(--color-neutral);
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+  }
+
+  .app-shell__topbar {
+    padding: 18px 40px;
+  }
+
+  .app-shell__content {
+    padding: 32px 40px 40px;
+    justify-content: flex-start;
+  }
+
+  .app-shell__content-inner {
+    max-width: 880px;
+  }
+
+  /* The bottom nav is fully replaced by the sidebar on desktop. */
+  .app-shell__nav {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  font-size: 0.98rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--color-primary-dark);
+}
+
+.btn--primary:disabled {
+  background: var(--color-border);
+  color: var(--color-text-soft);
+  cursor: not-allowed;
+}
+
+.btn--secondary {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-ink);
+}
+
+.btn--secondary:hover {
+  border-color: var(--color-primary);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* ==========================================================================
+   Screen layout
+   ========================================================================== */
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.screen__greeting {
+  font-size: 0.95rem;
+  color: var(--color-text-soft);
+}
+
+.screen__section-title {
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.screen__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+@media (min-width: 640px) {
+  .screen__actions {
+    flex-direction: row;
+  }
+
+  .screen__actions .btn {
+    flex: 1;
+  }
+}
+
+.screen__step {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.screen__step h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.screen__step-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.screen__step-actions .btn {
+  flex: 1;
+}
+
+/* Track Procurement: two content columns on desktop only. */
+.screen__track-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 1024px) {
+  .screen--track {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 24px;
+  }
+}
+
+/* ==========================================================================
+   Status badges — colour is always paired with an icon + text label
+   ========================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge svg {
+  width: 15px;
+  height: 15px;
+}
+
+.badge--neutral {
+  background: var(--color-neutral-bg);
+  color: var(--color-neutral);
+}
+
+.badge--good {
+  background: var(--color-good-bg);
+  color: var(--color-good);
+}
+
+.badge--warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.badge--danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+/* ==========================================================================
+   Loading / error / empty states
+   ========================================================================== */
+.state-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 40px 16px;
+  color: var(--color-text-soft);
+}
+
+.state-view__spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  animation: aps-spin 0.8s linear infinite;
+}
+
+@keyframes aps-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.state-view__icon {
+  width: 28px;
+  height: 28px;
+  color: var(--color-danger);
+}
+
+.state-view__title {
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+/* ==========================================================================
+   Booking summary (ticket-style card)
+   ========================================================================== */
+.booking-summary {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow-card);
+}
+
+.booking-summary--compact {
+  padding: 14px;
+  box-shadow: none;
+}
+
+.booking-summary__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.booking-summary__crop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-ink);
+}
+
+.booking-summary__crop svg {
+  color: var(--color-primary);
+  width: 20px;
+  height: 20px;
+}
+
+.booking-summary__details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px dashed var(--color-border);
+}
+
+@media (min-width: 640px) {
+  .booking-summary__details {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.booking-summary__details dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--color-text-soft);
+  margin-bottom: 4px;
+}
+
+.booking-summary__details dt svg {
+  width: 14px;
+  height: 14px;
+}
+
+.booking-summary__details dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   Token badge, queue status, ETA
+   ========================================================================== */
+.token-badge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+}
+
+.token-badge__icon {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.token-badge__label {
+  display: block;
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+.token-badge__value {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.queue-status {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.queue-status__ahead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-surface-tint);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.queue-status__ahead svg {
+  width: 22px;
+  height: 22px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.queue-status__ahead-value {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.queue-status__ahead-label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--color-text-soft);
+}
+
+.eta-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.eta-indicator svg {
+  width: 22px;
+  height: 22px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.eta-indicator__wait {
+  display: block;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.eta-indicator__completion {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   Status timeline
+   ========================================================================== */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline__step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  padding: 7px 0;
+}
+
+.timeline__step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 30px;
+  bottom: -7px;
+  width: 2px;
+  background: var(--color-border);
+}
+
+.timeline__marker {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.timeline__marker svg {
+  width: 15px;
+  height: 15px;
+  color: var(--color-primary);
+}
+
+.timeline__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-border);
+}
+
+.timeline__label {
+  font-size: 0.92rem;
+  color: var(--color-text-soft);
+}
+
+.timeline__step--done .timeline__marker {
+  border-color: var(--color-primary);
+  background: var(--color-good-bg);
+}
+
+.timeline__step--done .timeline__label {
+  color: var(--color-ink);
+}
+
+.timeline__step--done:not(:last-child)::before {
+  background: var(--color-primary);
+}
+
+.timeline__step--current .timeline__marker {
+  border-color: var(--color-primary);
+}
+
+.timeline__step--current .timeline__dot {
+  background: var(--color-primary);
+}
+
+.timeline__step--current .timeline__label {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+.timeline__step--stopped .timeline__marker {
+  border-color: var(--color-danger);
+}
+
+.timeline__step--stopped .timeline__dot {
+  background: var(--color-danger);
+}
+
+.timeline__step--stopped .timeline__label {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Adaptive scheduling alert — the product's key differentiator
+   ========================================================================== */
+.scheduling-alert {
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.scheduling-alert--on_track {
+  border-color: var(--color-good-bg);
+  background: var(--color-good-bg);
+}
+
+.scheduling-alert--at_risk {
+  border-color: var(--color-warning);
+  background: var(--color-warning-bg);
+}
+
+.scheduling-alert--delayed {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.scheduling-alert__headline {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.scheduling-alert__reason {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.92rem;
+}
+
+.scheduling-alert__details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  margin: 4px 0 0;
+}
+
+@media (min-width: 640px) {
+  .scheduling-alert__details {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.scheduling-alert__details dt {
+  font-size: 0.75rem;
+  color: var(--color-text-soft);
+  margin-bottom: 2px;
+}
+
+.scheduling-alert__details dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.scheduling-alert__keep {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--color-good);
+  margin: 6px 0 0;
+}
+
+.scheduling-alert__keep svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.scheduling-alert__note {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  color: var(--color-text-soft);
+}
+
+.scheduling-alert__recommendation {
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scheduling-alert__recommendation-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-soft);
+  margin: 0;
+}
+
+.scheduling-alert__recommendation-slot {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.scheduling-alert__recommendation-slot--muted {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-soft);
+}
+
+.scheduling-alert__disclaimer {
+  font-size: 0.78rem;
+  color: var(--color-text-soft);
+  margin: 4px 0 0;
+}
+
+.scheduling-alert .btn {
+  margin-top: 4px;
+  align-self: flex-start;
+}
+
+.alert-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.alert-pill span:nth-child(2) {
+  flex: 1;
+  font-size: 0.88rem;
+  color: var(--color-text);
+}
+
+.alert-pill svg:last-child {
+  color: var(--color-text-soft);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Selectable option lists (centres, slots, crop chips)
+   ========================================================================== */
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-list--grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+@media (min-width: 640px) {
+  .option-list--grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .option-list:not(.option-list--grid) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 1024px) {
+  .option-list--grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .option-list:not(.option-list--grid) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  cursor: pointer;
+  min-height: 48px;
+}
+
+.option-card svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.option-card__title {
+  display: block;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.option-card__subtitle {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--color-text-soft);
+}
+
+.option-card--selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-tint);
+}
+
+.option-card--slot {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.option-card__capacity {
+  font-size: 0.82rem;
+  color: var(--color-text-soft);
+}
+
+.option-card__capacity--low {
+  color: var(--color-warning);
+  font-weight: 600;
+}
+
+.option-chip {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-pill);
+  padding: 12px 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  cursor: pointer;
+  text-align: center;
+  min-height: 44px;
+}
+
+.option-chip--selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.slot-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.slot-selector__date {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-soft);
+}
+
+/* ==========================================================================
+   Booking flow stepper & review
+   ========================================================================== */
+.stepper {
+  list-style: none;
+  display: flex;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+}
+
+.stepper__step {
+  flex: 1;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-soft);
+  padding-bottom: 8px;
+  border-bottom: 3px solid var(--color-border);
+}
+
+.stepper__step--active {
+  color: var(--color-ink);
+  border-color: var(--color-primary);
+}
+
+.stepper__step--done {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--color-surface-tint);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin: 0;
+}
+
+.review-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.review-list dt {
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
+}
+
+.review-list dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-align: right;
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.form__error {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.field input {
+  font: inherit;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  min-height: 46px;
+}
+
+.field input:focus-visible {
+  border-color: var(--color-primary);
+}
+
+/* ==========================================================================
+   Onboarding
+   ========================================================================== */
+.onboarding {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 12px 4px 4px;
+}
+
+.onboarding__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.onboarding__icon {
+  width: 32px;
+  height: 32px;
+  color: var(--color-primary);
+}
+
+.onboarding__intro h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.onboarding__intro p {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   Confirmation, check-in, history, track-by-id
+   ========================================================================== */
+.confirmation-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-good-bg);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.confirmation-banner svg {
+  width: 28px;
+  height: 28px;
+  color: var(--color-good);
+  flex-shrink: 0;
+}
+
+.confirmation-banner__title {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.confirmation-banner__id {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.check-in-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.check-in-panel p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 1024px) {
+  .history-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.history-list__item {
+  all: unset;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+}
+
+.track-by-id {
+  margin-top: 8px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 16px;
+}
+
+.track-by-id summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+  font-weight: 600;
+}
+
+.track-by-id__form {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.track-by-id__form input {
+  flex: 1;
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  min-height: 44px;
+}
+
+/* ==========================================================================
+   Staff dashboard
+   --------------------------------------------------------------------------
+   Desktop-oriented centre staff console (#/staff). Reuses the same design
+   tokens, badge/button/state-view classes as the farmer app - this section
+   only adds the layout and panel chrome specific to the staff screens.
+   ========================================================================== */
+.screen--staff {
+  gap: 24px;
+}
+
+.staff-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.staff-dashboard__col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 1024px) {
+  .staff-dashboard {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 24px;
+  }
+}
+
+.staff-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.staff-panel__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.staff-panel__head-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.staff-panel__subtitle {
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+  margin-top: 2px;
+}
+
+/* ---- Centre health stat grid -------------------------------------------- */
+.staff-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin: 0;
+}
+
+.staff-stat dt {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-soft);
+}
+
+.staff-stat dd {
+  margin: 2px 0 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.staff-stat__note {
+  margin-top: 2px;
+  font-size: 0.76rem;
+  color: var(--color-text-soft);
+}
+
+/* ---- Currently serving --------------------------------------------------- */
+.staff-serving {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.staff-serving__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ---- Live queue table ----------------------------------------------------- */
+.staff-table-wrap {
+  overflow-x: auto;
+}
+
+.staff-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.staff-table th {
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-text-soft);
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.staff-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.staff-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---- Scheduling status summary --------------------------------------------- */
+.staff-status-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.staff-status-summary__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 4px;
+}
+
+.staff-status-summary__count {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+/* ---- Affected bookings ----------------------------------------------------- */
+.staff-affected-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.staff-affected-item {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.staff-affected-item__head {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.staff-affected-item__booking {
+  flex: 1;
+  font-weight: 600;
+  color: var(--color-ink);
+  font-size: 0.92rem;
+}
+
+.staff-affected-item__chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-soft);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.staff-affected-item__chevron--open {
+  transform: rotate(90deg);
+}
+
+.staff-affected-item__recommendation {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+}
+
+.staff-affected-item__details {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.staff-affected-item__details dt {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-text-soft);
+}
+
+.staff-affected-item__details dd {
+  margin: 1px 0 0;
+  font-size: 0.88rem;
+  color: var(--color-text);
+}
+
+.staff-affected-item__explanation dd {
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+@media (min-width: 1024px) {
+  .staff-stat-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
