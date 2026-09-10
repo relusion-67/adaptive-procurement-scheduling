@@ -48,6 +48,24 @@ async def check_in_booking(
         _raise_queue_error(error)
 
 
+@router.get("/bookings/{booking_id}", response_model=QueueEntryResponse)
+async def get_booking_queue_entry(
+    booking_id: int,
+    session: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> QueueEntryResponse:
+    """Return one booking's queue entry to its owner or authorized staff."""
+    booking = booking_repository.get_booking(session, booking_id)
+    if booking is None:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    ensure_booking_access(current_user, farmer_id=booking.farmer_id, centre_id=booking.centre_id)
+
+    entry = queue_repository.get_queue_entry_for_booking(session, booking_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail="Queue entry not found")
+    return entry
+
+
 @router.get("/centres/{centre_id}", response_model=list[QueueEntryResponse])
 async def get_live_queue(
     centre_id: int,

@@ -154,6 +154,16 @@ export function IconRefresh(props) {
   );
 }
 
+export function IconLogOut(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M9 21H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4" />
+      <path d="M16 17l5-5-5-5" />
+      <path d="M21 12H9" />
+    </svg>
+  );
+}
+
 // Reserved for the desktop sidebar's Staff/Admin placeholder section - not
 // used by any farmer-facing screen.
 export function IconLayoutGrid(props) {

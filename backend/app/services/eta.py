@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
+from app.core import clock
 from app.models import QueueStatus
 from app.repositories import queue as queue_repository
 from app.repositories import throughput as throughput_repository
@@ -75,5 +76,5 @@ def calculate_eta(session: Session, queue_entry_id: int) -> QueueETA:
         average_service_minutes=average_service_minutes,
         estimated_wait_minutes=estimated_wait_minutes,
         queue_status=queue_entry.queue_status,
-        calculated_at=datetime.now(timezone.utc),
+        calculated_at=clock.utcnow(),
     )

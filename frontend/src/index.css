@@ -1430,6 +1430,23 @@ button {
   gap: 24px;
 }
 
+.staff-dashboard__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.88rem;
+  color: var(--color-text);
+}
+
+.staff-dashboard__toolbar .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+}
+
 .staff-dashboard {
   display: flex;
   flex-direction: column;
@@ -1480,6 +1497,70 @@ button {
   font-size: 0.85rem;
   color: var(--color-text-soft);
   margin-top: 2px;
+}
+
+/* ---- Procurement recommendations ----------------------------------------- */
+.staff-recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.staff-recommendation {
+  border-left: 4px solid var(--color-neutral);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  background: var(--color-neutral-bg);
+}
+
+.staff-recommendation--high {
+  border-left-color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.staff-recommendation--medium {
+  border-left-color: var(--color-warning);
+  background: var(--color-warning-bg);
+}
+
+.staff-recommendation--low {
+  border-left-color: var(--color-good);
+  background: var(--color-good-bg);
+}
+
+.staff-recommendation__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.staff-recommendation__priority {
+  color: var(--color-text-soft);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.staff-recommendation p {
+  margin-top: 5px;
+  font-size: 0.88rem;
+}
+
+.staff-recommendation__evidence {
+  margin: 7px 0 0;
+  padding-left: 18px;
+  color: var(--color-text-soft);
+  font-size: 0.8rem;
+}
+
+.staff-recommendation code {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--color-text-soft);
+  font-size: 0.7rem;
 }
 
 /* ---- Centre health stat grid -------------------------------------------- */

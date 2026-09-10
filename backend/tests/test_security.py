@@ -28,7 +28,7 @@ from app.core.security import TOKEN_TYPE
 from app.db.seed import seed_demo_data
 from app.db.session import get_db
 from app.main import app
-from app.models import Booking, Farmer, ProcurementCentre
+from app.models import Booking, Farmer, ProcurementCentre, ProcurementSlot, QueueEntry
 from tests._auth_helpers import (
     auth_headers,
     create_admin,
@@ -92,6 +92,14 @@ def booking_for(session: Session, farmer_phone: str) -> Booking:
     result = session.scalar(select(Booking).where(Booking.farmer_id == f.id))
     assert result is not None
     return result
+
+
+def queue_entry_for(session: Session, booking: Booking) -> QueueEntry:
+    entry = session.scalar(
+        select(QueueEntry).where(QueueEntry.booking_id == booking.id)
+    )
+    assert entry is not None
+    return entry
 
 
 def _forged_token(user_id: int, role: str) -> str:
@@ -270,6 +278,68 @@ async def test_farmer_owner_can_access_their_own_booking(
 
 
 @pytest.mark.anyio
+async def test_farmer_can_view_their_own_profile(
+    raw_client: AsyncClient, db_session: Session
+) -> None:
+    owner = farmer(db_session, "9000000001")
+    owner_user = create_farmer_user(db_session, owner)
+
+    response = await raw_client.get(
+        f"/api/farmers/{owner.id}", headers=auth_headers(owner_user)
+    )
+    assert response.status_code == 200
+    assert response.json()["id"] == owner.id
+
+
+@pytest.mark.anyio
+async def test_farmer_cannot_view_another_farmers_profile(
+    raw_client: AsyncClient, db_session: Session
+) -> None:
+    caller = create_farmer_user(db_session, farmer(db_session, "9000000001"))
+    other_farmer = farmer(db_session, "9000000002")
+
+    response = await raw_client.get(
+        f"/api/farmers/{other_farmer.id}", headers=auth_headers(caller)
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.anyio
+async def test_staff_cannot_view_a_farmer_profile(
+    raw_client: AsyncClient, db_session: Session
+) -> None:
+    staff_user = create_staff_user(db_session, centre(db_session))
+    target_farmer = farmer(db_session, "9000000001")
+
+    response = await raw_client.get(
+        f"/api/farmers/{target_farmer.id}", headers=auth_headers(staff_user)
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.anyio
+async def test_admin_can_view_any_farmer_profile(
+    raw_client: AsyncClient, db_session: Session
+) -> None:
+    admin_user = create_admin(db_session)
+    target_farmer = farmer(db_session, "9000000001")
+
+    response = await raw_client.get(
+        f"/api/farmers/{target_farmer.id}", headers=auth_headers(admin_user)
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.anyio
+async def test_unauthenticated_farmer_profile_access_is_401(
+    raw_client: AsyncClient, db_session: Session
+) -> None:
+    target_farmer = farmer(db_session, "9000000001")
+    response = await raw_client.get(f"/api/farmers/{target_farmer.id}")
+    assert response.status_code == 401
+
+
+@pytest.mark.anyio
 async def test_farmer_cannot_create_booking_for_another_farmer(
     raw_client: AsyncClient, db_session: Session
 ) -> None:
@@ -302,6 +372,55 @@ async def test_farmer_cannot_check_in_another_farmers_booking(
         json={"booking_id": booking.id, "centre_id": booking.centre_id},
     )
     assert response.status_code == 403
+
+
+@pytest.mark.anyio
+async def test_farmer_can_view_their_own_booking_queue_entry(
+    raw_client: AsyncClient, db_session: Session
+) -> None:
+    owner = create_farmer_user(db_session, farmer(db_session, "9000000001"))
+    entry = queue_entry_for(db_session, booking_for(db_session, "9000000001"))
+
+    response = await raw_client.get(
+        f"/api/queue/bookings/{entry.booking_id}", headers=auth_headers(owner)
+    )
+
+    assert response.status_code == 200
+    assert response.json()["id"] == entry.id
+
+
+@pytest.mark.anyio
+async def test_farmer_cannot_view_another_farmers_booking_queue_entry(
+    raw_client: AsyncClient, db_session: Session
+) -> None:
+    other_farmer = create_farmer_user(db_session, farmer(db_session, "9000000002"))
+    entry = queue_entry_for(db_session, booking_for(db_session, "9000000001"))
+
+    response = await raw_client.get(
+        f"/api/queue/bookings/{entry.booking_id}", headers=auth_headers(other_farmer)
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.anyio
+async def test_staff_and_admin_can_view_booking_queue_entry(
+    raw_client: AsyncClient, db_session: Session
+) -> None:
+    target_booking = booking_for(db_session, "9000000001")
+    entry = queue_entry_for(db_session, target_booking)
+    staff = create_staff_user(db_session, centre(db_session))
+    admin = create_admin(db_session, email="queue-entry-admin@example.test")
+
+    staff_response = await raw_client.get(
+        f"/api/queue/bookings/{entry.booking_id}", headers=auth_headers(staff)
+    )
+    admin_response = await raw_client.get(
+        f"/api/queue/bookings/{entry.booking_id}", headers=auth_headers(admin)
+    )
+
+    assert staff_response.status_code == 200
+    assert admin_response.status_code == 200
 
 
 @pytest.mark.anyio
@@ -536,6 +655,24 @@ async def test_farmer_can_register_and_log_in(
     )
     assert me_response.status_code == 200
     assert me_response.json()["email"] == "farmer3@example.test"
+    slot = db_session.scalar(
+        select(ProcurementSlot)
+        .where(ProcurementSlot.centre_id == centre(db_session).id)
+        .order_by(ProcurementSlot.id)
+    )
+    assert slot is not None
+    booking_response = await raw_client.post(
+        "/api/bookings/",
+        headers={"Authorization": "Bearer " + token},
+        json={
+            "farmer_id": f.id,
+            "centre_id": slot.centre_id,
+            "slot_id": slot.id,
+            "crop_type": "Paddy",
+            "quantity_kg": 100,
+        },
+    )
+    assert booking_response.status_code == 201, booking_response.text
 
 
 @pytest.mark.anyio

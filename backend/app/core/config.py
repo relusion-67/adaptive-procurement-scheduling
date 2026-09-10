@@ -63,6 +63,11 @@ class Settings(BaseSettings):
                 "environment configuration when APP_ENV=production. Refusing "
                 "to start with the insecure development default."
             )
+        if self.app_env.lower() == "production" and not self.backend_cors_origins:
+            raise ValueError(
+                "BACKEND_CORS_ORIGINS must include the deployed frontend origin "
+                "when APP_ENV=production."
+            )
         return self
 
 

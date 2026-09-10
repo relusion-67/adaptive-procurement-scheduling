@@ -24,12 +24,34 @@ from app.models import (
     QueueStatus,
     ThroughputSnapshot,
 )
+from app.core import clock
 from app.services.eta import DEFAULT_AVERAGE_SERVICE_MINUTES
 from tests._auth_helpers import auth_headers, create_admin
 
 # --------------------------------------------------------------------------
 # Fixtures (mirrors the sqlite + Alembic pattern used across the test suite)
 # --------------------------------------------------------------------------
+
+
+@pytest.fixture(autouse=True)
+def frozen_clock(monkeypatch: pytest.MonkeyPatch) -> datetime:
+    """Freeze `app.core.clock.utcnow()` (the app's single "current instant"
+    seam - see app/core/clock.py) to a fixed, midnight-safe instant for
+    every test in this file.
+
+    Without this, `make_slot`/`add_snapshot` below (and the app code they
+    exercise) depend on the real wall clock. Since `ProcurementSlot` stores
+    one `slot_date` shared by both `start_time` and `end_time` (see
+    `_slot_datetime` in app/services/scheduling.py), a slot built from
+    real-time offsets can have its start and end silently fall on
+    *different* calendar dates whenever a test happens to run within a
+    couple of hours of UTC midnight - corrupting the stored slot without
+    raising an error, and making these tests flaky depending on time of
+    day rather than on actual behavior.
+    """
+    fixed_now = datetime(2026, 6, 15, 12, 0, 0, tzinfo=timezone.utc)
+    monkeypatch.setattr(clock, "utcnow", lambda: fixed_now)
+    return fixed_now
 
 
 @pytest.fixture
@@ -115,7 +137,7 @@ def add_snapshot(session: Session, centre_id: int, avg_minutes: str) -> None:
     session.add(
         ThroughputSnapshot(
             centre_id=centre_id,
-            snapshot_at=datetime.now(timezone.utc),
+            snapshot_at=clock.utcnow(),
             avg_minutes_per_farmer=Decimal(avg_minutes),
         )
     )
@@ -133,7 +155,7 @@ def make_slot(
     """Create a slot whose end time sits ``end_offset`` away from now, so
     tests can deterministically push a booking into ON_TRACK/AT_RISK/DELAYED
     without depending on the demo data's fixed October 2026 dates."""
-    end_dt = datetime.now(timezone.utc) + end_offset
+    end_dt = clock.utcnow() + end_offset
     start_dt = end_dt - duration
     slot = ProcurementSlot(
         centre_id=centre_id,

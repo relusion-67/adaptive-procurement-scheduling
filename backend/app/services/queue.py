@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
+from app.core import clock
 from app.models import Booking, BookingStatus, QueueEntry, QueueStatus
 from app.repositories import bookings as booking_repository
 from app.repositories import procurement as procurement_repository
@@ -49,7 +50,7 @@ def _reject_early_check_in(booking: Booking) -> None:
     slot = booking.slot
     if slot is None:
         return
-    now = datetime.now(timezone.utc)
+    now = clock.utcnow()
     if slot.slot_date != now.date():
         return
     earliest_check_in = _slot_start_datetime(slot) - timedelta(
@@ -89,7 +90,7 @@ def check_in_booking(session: Session, booking_id: int, centre_id: int) -> Queue
                 booking_id=booking.id,
                 token_number=queue_repository.next_token_number(session, centre.id),
                 queue_status=QueueStatus.WAITING,
-                checked_in_at=datetime.now(timezone.utc),
+                checked_in_at=clock.utcnow(),
             ),
         )
         booking.status = BookingStatus.IN_QUEUE
@@ -123,7 +124,7 @@ def call_next_farmer(session: Session, centre_id: int) -> QueueEntry:
             raise QueueError("No waiting farmers in this queue", 409)
 
         queue_entry.queue_status = QueueStatus.CALLED
-        queue_entry.called_at = datetime.now(timezone.utc)
+        queue_entry.called_at = clock.utcnow()
         queue_entry.booking.status = BookingStatus.IN_QUEUE
         session.commit()
         session.refresh(queue_entry)
@@ -194,7 +195,7 @@ def _transition_queue_entry(
         queue_entry.queue_status = target_status
         queue_entry.booking.status = booking_status
         if set_served_at:
-            queue_entry.served_at = datetime.now(timezone.utc)
+            queue_entry.served_at = clock.utcnow()
         session.commit()
         session.refresh(queue_entry)
         return queue_entry

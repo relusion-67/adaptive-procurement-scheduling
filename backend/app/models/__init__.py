@@ -11,6 +11,7 @@ from app.models.domain import (
     QueueStatus,
     ThroughputSnapshot,
 )
+from app.models.reference import DATA_STATUS_VALUES, ReferenceDataset
 
 __all__ = [
     "Farmer",
@@ -25,4 +26,6 @@ __all__ = [
     "NotificationChannel",
     "User",
     "UserRole",
+    "ReferenceDataset",
+    "DATA_STATUS_VALUES",
 ]

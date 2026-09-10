@@ -93,7 +93,7 @@ def register_user(session: Session, data: UserRegister) -> User:
         session,
         email=data.email,
         password=data.password,
-        role=data.role,
+        role=UserRole.FARMER,
         farmer_id=data.farmer_id,
         centre_id=data.centre_id,
     )

@@ -8,6 +8,7 @@ from app.api.routers import (
     farmers,
     notifications,
     queue,
+    reference,
     scheduling,
     slots,
     system,
@@ -32,3 +33,4 @@ api_router.include_router(
     tags=["notifications"],
 )
 api_router.include_router(admin.router, prefix="/admin", tags=["admin"])
+api_router.include_router(reference.router, prefix="/reference", tags=["reference"])

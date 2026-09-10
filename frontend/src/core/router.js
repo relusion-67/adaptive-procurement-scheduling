@@ -5,15 +5,22 @@
 import { useEffect, useState } from "react";
 
 function readHash() {
-  const hash = window.location.hash.replace(/^#/, "") || "/";
-  const [path, query] = hash.split("?");
+  const hashPath = window.location.hash.replace(/^#/, "");
+  const pathSource = hashPath || window.location.pathname || "/";
+  const [path, query] = pathSource.split("?");
   const params = Object.fromEntries(new URLSearchParams(query));
   const segments = path.split("/").filter(Boolean);
   return { path, segments, params };
 }
 
 export function navigate(path) {
-  window.location.hash = path;
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  // Hash routes are the deploy-safe canonical format. Clear a pathname-only
+  // deep link first so navigation never produces `/farmer#/staff`.
+  if (window.location.pathname !== "/") {
+    window.history.replaceState({}, "", "/");
+  }
+  window.location.hash = normalizedPath;
 }
 
 export function useHashRoute() {

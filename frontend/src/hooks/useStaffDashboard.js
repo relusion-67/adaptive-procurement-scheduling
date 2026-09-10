@@ -17,17 +17,23 @@ const INITIAL_STATE = { centreId: null, status: "idle", data: null, error: null 
 export function useStaffDashboard(centreId) {
   const [state, setState] = useState(INITIAL_STATE);
   const intervalRef = useRef(null);
+  const requestIdRef = useRef(0);
 
   const load = useCallback(
     (isBackground) => {
       if (!centreId) return;
+      const requestId = ++requestIdRef.current;
       // No synchronous setState here on purpose (mirrors
       // hooks/useBookingContext.js): "loading" is derived below from
       // whether the last completed fetch matches the requested centreId,
       // rather than reset eagerly inside the effect.
       loadStaffDashboard(centreId)
-        .then((data) => setState({ centreId, status: "ready", data, error: null }))
-        .catch((error) =>
+        .then((data) => {
+          if (requestId !== requestIdRef.current) return;
+          setState({ centreId, status: "ready", data, error: null });
+        })
+        .catch((error) => {
+          if (requestId !== requestIdRef.current) return;
           setState((prev) => ({
             centreId,
             status: "error",
@@ -35,8 +41,8 @@ export function useStaffDashboard(centreId) {
             // failed background refresh, rather than blanking the screen.
             data: isBackground ? prev.data : null,
             error,
-          })),
-        );
+          }));
+        });
     },
     [centreId],
   );

@@ -16,8 +16,10 @@
 import { ApiError } from "../api/client";
 import {
   getCentreSchedule,
+  getCentreProcurementInsights,
   getLatestThroughput,
   getLiveQueue,
+  getSlot,
   listCentres,
 } from "../api/endpoints";
 
@@ -42,14 +44,16 @@ export const SCHEDULING_STATES = ["ON_TRACK", "AT_RISK", "DELAYED"];
  * }>}
  */
 export async function loadStaffDashboard(centreId) {
-  const [centres, liveQueue, assessments, throughput] = await Promise.all([
+  const [centres, liveQueue, assessments, throughput, insights] = await Promise.all([
     listCentres(), // GET /api/centres/
     getLiveQueue(centreId), // GET /api/queue/centres/{id}
     getCentreSchedule(centreId), // GET /api/scheduling/centres/{id}
     loadThroughput(centreId), // GET /api/admin/throughput/{id}
+    getCentreProcurementInsights(centreId), // GET /api/centres/{id}/procurement-insights
   ]);
 
   const centre = centres.find((c) => c.id === centreId) ?? null;
+  const assessmentSlots = await loadAssessmentSlots(assessments);
 
   // "Currently serving" / "currently called" are not separate backend
   // fields - they're derived by reading queue_status off the live queue
@@ -79,11 +83,29 @@ export async function loadStaffDashboard(centreId) {
     currentlyServing,
     currentlyCalled,
     waitingCount,
-    assessments,
+    assessments: assessments.map((assessment) => ({
+      ...assessment,
+      slot: assessmentSlots.get(assessment.slot_id) ?? null,
+    })),
     statusCounts,
     affectedBookings,
     throughput,
+    insights,
   };
+}
+
+async function loadAssessmentSlots(assessments) {
+  const slotIds = [...new Set(assessments.map((assessment) => assessment.slot_id))];
+  const results = await Promise.all(
+    slotIds.map(async (slotId) => {
+      try {
+        return [slotId, await getSlot(slotId)];
+      } catch {
+        return [slotId, null];
+      }
+    }),
+  );
+  return new Map(results);
 }
 
 async function loadThroughput(centreId) {

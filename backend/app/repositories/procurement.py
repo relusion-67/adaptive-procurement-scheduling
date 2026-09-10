@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
+from app.core import clock
 from app.models import ProcurementCentre, ProcurementSlot
 
 
@@ -42,7 +43,7 @@ def is_slot_expired(
 ) -> bool:
     """Return whether a procurement slot's booking window has ended."""
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = clock.utcnow()
     return _slot_end_datetime(slot) < now
 
 
@@ -56,7 +57,7 @@ def list_usable_slots(
     visible while a slot whose window has already elapsed is excluded.
     """
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = clock.utcnow()
 
     candidates = session.scalars(
         select(ProcurementSlot)

@@ -7,6 +7,7 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from sqlalchemy.orm import Session
 
+from app.core import clock
 from app.models import Booking, BookingStatus, ProcurementSlot, QueueStatus
 from app.repositories import bookings as booking_repository
 from app.repositories import procurement as procurement_repository
@@ -119,7 +120,7 @@ def _assess(session: Session, booking: Booking) -> SchedulingAssessment:
         # instant, when would they finish?". See _forecast_estimate for the
         # full carryover/ahead-demand projection.
         is_forecast = True
-        calculated_at = datetime.now(timezone.utc)
+        calculated_at = clock.utcnow()
         average_service_minutes = _average_service_minutes(session, booking.centre_id)
         forecast_detail = _forecast_estimate(
             session, booking, slot, calculated_at, average_service_minutes
